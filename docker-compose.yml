@@ -1,0 +1,46 @@
+services:
+  statping:
+    image: adamboutcher/statping-ng
+    container_name: statping
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # --- Core server ---
+      - PORT=8080
+      - TZ=${TZ}
+      - LANGUAGE=en
+      - NAME=${SITE_NAME}
+      - DESCRIPTION=${SITE_DESCRIPTION}
+      - PUBLIC=true
+
+      # --- Auth / bootstrap admin (first-run only) ---
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+
+      # --- Storage (SQLite for simplicity) ---
+      - DB_CONN=sqlite
+      # statping-ng stores SQLite DB under /app by default; persisted via volume below
+
+      # --- Optional mail (uncomment & set if you want email alerts) ---
+      # - SMTP_HOST=smtp.example.com
+      # - SMTP_PORT=587
+      # - SMTP_USER=apikey
+      # - SMTP_PASSWORD=xxxxx
+      # - SMTP_FROM=status@aleph.cloud
+      # - SMTP_TLS=true
+
+    volumes:
+      - statping-data:/app
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+volumes:
+  statping-data:
+
