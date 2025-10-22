@@ -1,10 +1,10 @@
 services:
   statping:
-    image: adamboutcher/statping-ng
+    image: odesenfans/statping-ng:v0.93.0
     container_name: statping
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
       # --- Core server ---
       - PORT=8080
@@ -41,6 +41,38 @@ services:
       retries: 10
       start_period: 40s
 
+  aleph-monitor:
+    image: alephim/aleph-monitor:latest
+    container_name: aleph-monitor
+    restart: unless-stopped
+    environment:
+      ALEPH_SCHEDULER_API_URL: ${ALEPH_SCHEDULER_API_URL}
+      ALEPH_BATCHER_ADDRESS: ${ALEPH_BATCHER_ADDRESS}
+      ETHEREUM_RPC_URL: ${ETHEREUM_RPC_URL}
+      RUST_LOG: info
+
+  prometheus:
+    image: prom/prometheus:v3.6.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./config/prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.0
+    depends_on:
+      - prometheus
+    volumes:
+      - ./config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./config/alertmanager/templates:/etc/alertmanager/templates:ro
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+
 volumes:
   statping-data:
+  prometheus-data:
 
