@@ -1,0 +1,27 @@
+groups:
+  - name: wallet_monitor
+    rules:
+
+      # --- 1) Low ETH balance alert ---
+      - alert: LowBatcherBalance
+        expr: batcher_balance_eth < 0.01
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Batcher balance is low"
+          description: |
+            The L1 batcher wallet balance dropped below 0.01 ETH.
+            Current balance: {{ $value | printf "%.6f" }} ETH.
+
+      # --- 2) Scheduler heartbeat missing ---
+      - alert: SchedulerHeartbeatMissing
+        expr: time() - scheduler_last_heartbeat > 600
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Scheduler heartbeat missing"
+          description: |
+            No scheduler heartbeat received in over 10 minutes.
+            Last heartbeat was {{ $value | humanizeDuration }} ago.

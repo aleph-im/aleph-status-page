@@ -1,0 +1,14 @@
+route:
+  receiver: 'telegram'
+
+receivers:
+  - name: 'telegram'
+    telegram_configs:
+      - bot_token: '<BOT_TOKEN>'
+        chat_id: <CHAT_ID>      # can be negative for groups/channels
+        send_resolved: true
+        message: |
+          {{ template "telegram.default.message" . }}
+
+templates:
+  - /etc/alertmanager/templates/*.tmpl

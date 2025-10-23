@@ -1,0 +1,28 @@
+# Development and source control
+.git/
+.gitignore
+README.md
+LICENSE
+*.md
+
+# Rust specific
+target/
+**/*.rs.bk
+debug/
+release/
+
+# Editor and OS specific
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
+
+# Environment files
+.env
+.env.*
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose.yml
